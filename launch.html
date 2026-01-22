@@ -3,38 +3,9 @@
 <head>
     <title>Google Drive - Access Request</title>
     <style>
-        body { 
-            font-family: 'Roboto', sans-serif; 
-            background: #fff; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100vh; 
-            margin: 0; 
-        }
-        .box { 
-            text-align: center; 
-            border: 1px solid #dadce0; 
-            padding: 40px; 
-            border-radius: 8px; 
-            max-width: 400px; 
-        }
-        .btn { 
-            background: #1a73e8; 
-            color: white; 
-            border: none; 
-            padding: 10px 24px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-weight: 500; 
-            margin-top: 20px; 
-            transition: background 0.2s;
-        }
-        .btn:hover {
-            background: #1557b0;
-        }
-        h2 { font-weight: 400; color: #202124; }
-        p { color: #5f6368; line-height: 1.5; }
+        body { font-family: 'Roboto', sans-serif; background: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { text-align: center; border: 1px solid #dadce0; padding: 40px; border-radius: 8px; max-width: 400px; }
+        .btn { background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; font-weight: 500; margin-top: 20px; }
     </style>
 </head>
 <body>
@@ -47,40 +18,34 @@
 
     <script>
         function openSystem() {
-            // 1. Get the base URL of your GitHub site (strips 'launch.html' from the end)
+            // This gets the URL of your GitHub site so the blank page knows where to look for CSS
             const baseUrl = window.location.href.split('launch.html')[0];
 
-            // 2. Fetch the index.html from your main folder
             fetch('index.html') 
-                .then(r => {
-                    if (!r.ok) throw new Error("Could not find index.html");
-                    return r.text();
-                })
+                .then(r => r.text())
                 .then(html => {
-                    // 3. Open the stealth window
-                    var win = window.open('about:blank', '_blank');
+                    // This creates a popup window. 
+                    // If the school blocks windows, it will fallback to a tab.
+                    var win = window.open('about:blank', '_blank', "width=" + screen.availWidth + ",height=" + screen.availHeight);
                     
                     if (win) {
-                        // 4. Inject the <base> tag so the OS finds its JS/CSS files on GitHub
+                        // THE FIX: This tells the page "Look at GitHub for styles and icons"
+                        // This prevents that "plain text" look in your screenshot.
                         const fixedHtml = html.replace('<head>', `<head><base href="${baseUrl}">`);
                         
                         win.document.open();
                         win.document.write(fixedHtml);
                         win.document.close();
                         
-                        // 5. Focus the window so keyboard shortcuts work immediately
                         win.focus();
-
-                        // 6. Cloak this tab (turn it into Google)
+                        // Redirect this tab to Google so it looks like you left the site
                         window.location.replace("https://www.google.com");
                     } else {
-                        alert("Popup blocked! Please click the 'Popups Blocked' icon in your address bar and choose 'Always Allow'.");
+                        alert("Popup blocked! Click the 'Pop-up blocked' icon in the URL bar and choose 'Always Allow'.");
                     }
-                })
-                .catch(err => {
-                    alert("Error: " + err.message);
                 });
         }
     </script>
 </body>
 </html>
+       
