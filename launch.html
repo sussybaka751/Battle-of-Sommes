@@ -18,19 +18,17 @@
 
     <script>
         function openSystem() {
-            // FIX 1: Point exactly to the OneFile folder
+            // We are pointing directly to the folder that has the "OneFile" version
             const baseUrl = window.location.href.split('launch.html')[0] + 'NautilusOS-OneFile/';
-            const filePath = baseUrl + 'index.html';
+            const targetFile = baseUrl + 'index.html';
 
-            fetch(filePath) 
+            fetch(targetFile) 
                 .then(r => r.text())
                 .then(html => {
-                    // FIX 2: Force a NEW WINDOW by adding "menubar=no,status=no"
-                    // This tells the Chromebook "Don't make this a tab"
-                    var win = window.open('about:blank', '_blank', "width=" + screen.availWidth + ",height=" + screen.availHeight + ",menubar=no,status=no,toolbar=no");
+                    var win = window.open('about:blank', '_blank', "width=" + screen.availWidth + ",height=" + screen.availHeight);
                     
                     if (win) {
-                        // FIX 3: Inject the base URL so styles load
+                        // The Magic Fix: Tells the blank window to look inside your folder for everything
                         const fixedHtml = html.replace('<head>', `<head><base href="${baseUrl}">`);
                         
                         win.document.open();
@@ -40,11 +38,12 @@
                         win.focus();
                         window.location.replace("https://www.google.com");
                     } else {
-                        alert("Popup blocked! Look at the top right of your URL bar and click 'Always Allow'.");
+                        alert("Popup blocked! Click the 'Pop-up blocked' icon in the URL bar.");
                     }
                 })
-                .catch(err => alert("File not found in NautilusOS-OneFile folder!"));
+                .catch(err => alert("Could not find the file! Check if 'NautilusOS-OneFile' is spelled correctly."));
         }
     </script>
 </body>
 </html>
+                 
