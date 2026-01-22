@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Google Drive - Access Request</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #3c4043;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+            text-align: center;
+            max-width: 400px;
+        }
+        h2 { margin-top: 0; font-weight: 400; }
+        p { color: #5f6368; margin-bottom: 24px; }
+        .btn {
+            background-color: #1a73e8;
+            color: white;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn:hover { background-color: #1765cc; box-shadow: 0 1px 2px rgba(60,64,67,0.3); }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <svg width="48" height="48" viewBox="0 0 87.3 78" style="margin-bottom:15px;">
+            <path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/>
+            <path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44a9.06 9.06 0 0 0 -1.2 4.5h27.5z" fill="#00ac47"/>
+            <path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/>
+            <path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.4-4.5 1.2z" fill="#00832d"/>
+            <path d="m59.8 53h-27.5l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.5c1.6 0 3.15-.4 4.5-1.2z" fill="#2684fc"/>
+            <path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 27.5 47.6c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5 0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/>
+        </svg>
+        <h2>Document Protected</h2>
+        <p>Please click below to verify student access.</p>
+        <button class="btn" onclick="launchSystem()">Verify & Open</button>
+    </div>
+
+    <script>
+        function launchSystem() {
+            // TARGET FILE: We are targeting the OneFile version specifically
+            // If you changed the folder name, update 'NautilusOS-OneFile' below
+            const filePath = 'NautilusOS-OneFile/index.html';
+
+            fetch(filePath)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Could not find file at: " + filePath + " (Status: " + response.status + ")");
+                    }
+                    return response.text();
+                })
+                .then(html => {
+                    const width = screen.availWidth;
+                    const height = screen.availHeight;
+                    
+                    // Create the About:Blank window
+                    const win = window.open("about:blank", "_blank", `width=${width},height=${height}`);
+                    
+                    if (!win) {
+                        alert("Popup Blocked! Please check the address bar icon.");
+                        return;
+                    }
+
+                    // Inject the OS
+                    win.document.write(html);
+                    win.document.close();
+                    
+                    // Focus Fix: Forces the Chromebook to look at the new window
+                    setTimeout(() => { win.focus(); }, 100);
+
+                    // Cloak: Redirect this launch page to Google immediately
+                    window.location.href = "https://www.google.com";
+                })
+                .catch(error => {
+                    alert("Error launching OS: " + error.message);
+                    console.error(error);
+                });
+        }
+    </script>
+</body>
+</html>
