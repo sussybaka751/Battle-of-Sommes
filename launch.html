@@ -18,32 +18,34 @@
 
     <script>
         function openSystem() {
-            // We are pointing directly to the folder that has the "OneFile" version
-            const baseUrl = window.location.href.split('launch.html')[0] + 'NautilusOS-OneFile/';
-            const targetFile = baseUrl + 'index.html';
+            // This points to the folder where ALL the Nautilus files live
+            const repoPath = window.location.origin + window.location.pathname.replace('launch.html', '');
+            const baseUrl = repoPath + 'NautilusOS-OneFile/';
 
-            fetch(targetFile) 
+            fetch(baseUrl + 'index.html') 
                 .then(r => r.text())
                 .then(html => {
-                    var win = window.open('about:blank', '_blank', "width=" + screen.availWidth + ",height=" + screen.availHeight);
-                    
+                    var win = window.open('about:blank', '_blank');
                     if (win) {
-                        // The Magic Fix: Tells the blank window to look inside your folder for everything
-                        const fixedHtml = html.replace('<head>', `<head><base href="${baseUrl}">`);
+                        // We must add the <base> tag AND fix the paths manually
+                        let fixedHtml = html.replace('<head>', `<head><base href="${baseUrl}">`);
                         
+                        // Some versions of Nautilus use absolute paths (/js/...) 
+                        // We force them to be relative so they stay inside your folder.
+                        fixedHtml = fixedHtml.replaceAll('src="/', 'src="./');
+                        fixedHtml = fixedHtml.replaceAll('href="/', 'href="./');
+
                         win.document.open();
                         win.document.write(fixedHtml);
                         win.document.close();
                         
                         win.focus();
                         window.location.replace("https://www.google.com");
-                    } else {
-                        alert("Popup blocked! Click the 'Pop-up blocked' icon in the URL bar.");
                     }
                 })
-                .catch(err => alert("Could not find the file! Check if 'NautilusOS-OneFile' is spelled correctly."));
+                .catch(e => alert("Error: Make sure the folder 'NautilusOS-OneFile' exists in your GitHub!"));
         }
     </script>
 </body>
 </html>
-                 
+                  
