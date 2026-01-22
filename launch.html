@@ -18,19 +18,19 @@
 
     <script>
         function openSystem() {
-            // This gets the URL of your GitHub site so the blank page knows where to look for CSS
-            const baseUrl = window.location.href.split('launch.html')[0];
+            // FIX 1: Point exactly to the OneFile folder
+            const baseUrl = window.location.href.split('launch.html')[0] + 'NautilusOS-OneFile/';
+            const filePath = baseUrl + 'index.html';
 
-            fetch('index.html') 
+            fetch(filePath) 
                 .then(r => r.text())
                 .then(html => {
-                    // This creates a popup window. 
-                    // If the school blocks windows, it will fallback to a tab.
-                    var win = window.open('about:blank', '_blank', "width=" + screen.availWidth + ",height=" + screen.availHeight);
+                    // FIX 2: Force a NEW WINDOW by adding "menubar=no,status=no"
+                    // This tells the Chromebook "Don't make this a tab"
+                    var win = window.open('about:blank', '_blank', "width=" + screen.availWidth + ",height=" + screen.availHeight + ",menubar=no,status=no,toolbar=no");
                     
                     if (win) {
-                        // THE FIX: This tells the page "Look at GitHub for styles and icons"
-                        // This prevents that "plain text" look in your screenshot.
+                        // FIX 3: Inject the base URL so styles load
                         const fixedHtml = html.replace('<head>', `<head><base href="${baseUrl}">`);
                         
                         win.document.open();
@@ -38,14 +38,13 @@
                         win.document.close();
                         
                         win.focus();
-                        // Redirect this tab to Google so it looks like you left the site
                         window.location.replace("https://www.google.com");
                     } else {
-                        alert("Popup blocked! Click the 'Pop-up blocked' icon in the URL bar and choose 'Always Allow'.");
+                        alert("Popup blocked! Look at the top right of your URL bar and click 'Always Allow'.");
                     }
-                });
+                })
+                .catch(err => alert("File not found in NautilusOS-OneFile folder!"));
         }
     </script>
 </body>
 </html>
-       
