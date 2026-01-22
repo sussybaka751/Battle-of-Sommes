@@ -1,51 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Google Drive - Access Request</title>
-    <style>
-        body { font-family: 'Roboto', sans-serif; background: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
-        .box { text-align: center; border: 1px solid #dadce0; padding: 40px; border-radius: 8px; max-width: 400px; }
-        .btn { background: #1a73e8; color: white; border: none; padding: 10px 24px; border-radius: 4px; cursor: pointer; font-weight: 500; margin-top: 20px; }
-    </style>
-</head>
-<body>
-    <div class="box">
-        <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" width="60">
-        <h2>Document Protected</h2>
-        <p>This file is restricted to school-managed accounts. Please verify to continue.</p>
-        <button class="btn" onclick="openSystem()">Verify & Open</button>
-    </div>
+<script>
+    function openSystem() {
+        const baseUrl = window.location.href.split('launch.html')[0] + 'NautilusOS-OneFile/';
+        
+        fetch(baseUrl + 'index.html') 
+            .then(r => r.text())
+            .then(html => {
+                var win = window.open('about:blank', '_blank');
+                if (win) {
+                    // This version tells the browser to find everything in the same folder
+                    // by removing the folder prefixes (js/, uv/, css/) from the code
+                    let fixedHtml = html.replace('<head>', `<head><base href="${baseUrl}">`);
+                    
+                    fixedHtml = fixedHtml.replaceAll('src="js/', 'src="');
+                    fixedHtml = fixedHtml.replaceAll('href="css/', 'href="');
+                    fixedHtml = fixedHtml.replaceAll('src="uv/', 'src="');
+                    fixedHtml = fixedHtml.replaceAll('href="uv/', 'href="');
 
-    <script>
-        function openSystem() {
-            // This points to the folder where ALL the Nautilus files live
-            const repoPath = window.location.origin + window.location.pathname.replace('launch.html', '');
-            const baseUrl = repoPath + 'NautilusOS-OneFile/';
-
-            fetch(baseUrl + 'index.html') 
-                .then(r => r.text())
-                .then(html => {
-                    var win = window.open('about:blank', '_blank');
-                    if (win) {
-                        // We must add the <base> tag AND fix the paths manually
-                        let fixedHtml = html.replace('<head>', `<head><base href="${baseUrl}">`);
-                        
-                        // Some versions of Nautilus use absolute paths (/js/...) 
-                        // We force them to be relative so they stay inside your folder.
-                        fixedHtml = fixedHtml.replaceAll('src="/', 'src="./');
-                        fixedHtml = fixedHtml.replaceAll('href="/', 'href="./');
-
-                        win.document.open();
-                        win.document.write(fixedHtml);
-                        win.document.close();
-                        
-                        win.focus();
-                        window.location.replace("https://www.google.com");
-                    }
-                })
-                .catch(e => alert("Error: Make sure the folder 'NautilusOS-OneFile' exists in your GitHub!"));
-        }
-    </script>
-</body>
-</html>
-                  
+                    win.document.open();
+                    win.document.write(fixedHtml);
+                    win.document.close();
+                    
+                    win.focus();
+                    window.location.replace("https://www.google.com");
+                }
+            });
+    }
+</script>
