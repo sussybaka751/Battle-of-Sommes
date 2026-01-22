@@ -1,28 +1,95 @@
-<script>
-    function openSystem() {
-        const baseUrl = window.location.href.split('launch.html')[0] + 'NautilusOS-OneFile/';
-        
-        fetch(baseUrl + 'index.html') 
-            .then(r => r.text())
-            .then(html => {
-                var win = window.open('about:blank', '_blank');
-                if (win) {
-                    // This version tells the browser to find everything in the same folder
-                    // by removing the folder prefixes (js/, uv/, css/) from the code
-                    let fixedHtml = html.replace('<head>', `<head><base href="${baseUrl}">`);
-                    
-                    fixedHtml = fixedHtml.replaceAll('src="js/', 'src="');
-                    fixedHtml = fixedHtml.replaceAll('href="css/', 'href="');
-                    fixedHtml = fixedHtml.replaceAll('src="uv/', 'src="');
-                    fixedHtml = fixedHtml.replaceAll('href="uv/', 'href="');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Drive - Access Request</title>
+    <style>
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background: #fff; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            margin: 0; 
+        }
+        .box { 
+            text-align: center; 
+            border: 1px solid #dadce0; 
+            padding: 40px; 
+            border-radius: 8px; 
+            max-width: 400px; 
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .btn { 
+            background: #1a73e8; 
+            color: white; 
+            border: none; 
+            padding: 10px 24px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-weight: 500; 
+            margin-top: 20px; 
+            font-size: 14px;
+        }
+        .btn:hover { background: #1557b0; }
+        h2 { font-weight: 400; color: #202124; margin-top: 20px; }
+        p { color: #5f6368; line-height: 1.5; font-size: 14px; }
+    </style>
+</head>
+<body>
+    <div class="box">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg" width="60" alt="Google Drive">
+        <h2>Document Protected</h2>
+        <p>This file is restricted to school-managed accounts. Please verify your identity to continue to the shared drive.</p>
+        <button class="btn" onclick="openSystem()">Verify & Open</button>
+    </div>
 
-                    win.document.open();
-                    win.document.write(fixedHtml);
-                    win.document.close();
+    <script>
+        function openSystem() {
+            // This detects the folder where your index.html and assets are sitting
+            const baseUrl = window.location.href.split('launch.html')[0] + 'NautilusOS-OneFile/';
+            const targetFile = baseUrl + 'index.html';
+
+            fetch(targetFile) 
+                .then(r => {
+                    if (!r.ok) throw new Error("Could not find index.html in NautilusOS-OneFile folder");
+                    return r.text();
+                })
+                .then(html => {
+                    // Opens a stealth window
+                    var win = window.open('about:blank', '_blank', "width=" + screen.availWidth + ",height=" + screen.availHeight);
                     
-                    win.focus();
-                    window.location.replace("https://www.google.com");
-                }
-            });
-    }
-</script>
+                    if (win) {
+                        // THE MAGIC: 
+                        // 1. Tells the page to look at your GitHub folder for assets
+                        // 2. Fixes the paths because your files are "Flat" (not in folders like js/ or uv/)
+                        let fixedHtml = html.replace('<head>', `<head><base href="${baseUrl}">`);
+                        
+                        // Path Fixes for Flat Uploads
+                        fixedHtml = fixedHtml.replaceAll('src="js/', 'src="');
+                        fixedHtml = fixedHtml.replaceAll('href="css/', 'href="');
+                        fixedHtml = fixedHtml.replaceAll('src="uv/', 'src="');
+                        fixedHtml = fixedHtml.replaceAll('href="uv/', 'href="');
+                        fixedHtml = fixedHtml.replaceAll('src="/js/', 'src="./'); // Handles slash-prefixed paths
+
+                        win.document.open();
+                        win.document.write(fixedHtml);
+                        win.document.close();
+                        
+                        win.focus();
+
+                        // Redirect the current tab to Google to hide the evidence
+                        window.location.replace("https://www.google.com");
+                    } else {
+                        alert("Popup blocked! Look at the right side of your address bar, click the 'Window with Red X' icon, and select 'Always Allow'.");
+                    }
+                })
+                .catch(err => {
+                    alert("Launcher Error: " + err.message);
+                });
+        }
+    </script>
+</body>
+</html>
